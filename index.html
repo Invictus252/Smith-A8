@@ -124,8 +124,7 @@
                     </div>
                 </div>
             </div>
-        </div>    
-        
+        </div>
         <div id='registerDlg' class="modal" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -153,12 +152,13 @@
                 </div>
             </div>
         </div> 
-</div>
+        </div>
         <script>
         /* global $ */
         $(document).ready(function() 
         {
             // model ....
+            
             let model = {};
             let Gmodel= {};
 
@@ -276,7 +276,7 @@
 
             $('#resetLowBtn').click(function() 
             {
-                sendRequest("resetLow?low=" + 10,function(){});
+                sendRequest("updateLow?low=10",function(){});
                 initializeModel();
                 updateView();                
             });   
@@ -309,12 +309,7 @@
             {
                 let email = $('#email').val().trim();
                 let password = $('#password').val().trim();
-                
-                sendRequest("login?email="+email+"&password="+password, function ()
-                {
-                    // if (model.error == undefined)
-                    //     sendRequest("listSongs");    
-                });
+                sendRequest("login?email="+email+"&password="+password, function (){});
                 $('#loginDlg').modal('hide');
             });
 
@@ -322,12 +317,7 @@
             {
                 let email = $('#regEmail').val().trim();
                 let password = $('#regPassword').val().trim();
-                sendRequest("register?email="+email+"&password="+password, function () 
-                { 
-                    // if (model.error == undefined)
-                    //     sendRequest("listSongs");
-                });
-                
+                sendRequest("register?email="+email+"&password="+password, function (){});
                 $('#registerDlg').modal('hide');
             });
             

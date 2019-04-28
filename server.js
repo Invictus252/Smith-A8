@@ -30,9 +30,6 @@ app.all('/register', register);
 app.all('/login', login);
 app.all('/logout', logout);
 app.all('/updateLow', updateLow);
-app.all('/resetLow', resetLow);
-
-
 
 app.listen(process.env.PORT,  process.env.IP, startHandler())
 
@@ -41,12 +38,13 @@ function startHandler()
   console.log('Server listening on port ' + process.env.PORT)
 }
 
-
 function updateLow(req, res)
 {
   var con = mysql.createConnection(conInfo);
   
-  console.log("@updateLow");
+  //console.log("@updateLow");
+  
+  
   let sql = `UPDATE USER
            SET USER_LOW = ?
            WHERE USER_ID = ?`;
@@ -54,59 +52,33 @@ function updateLow(req, res)
   let data = [req.query.low, req.session.user.result.id];
   
   
+  let sql2 = `SELECT * FROM USER 
+              WHERE USER_EMAIL = ?`;
  
-  if(req.query.low  <  req.session.user.result.low || isNaN(req.session.user.result.low)){
+  let data2 = [req.session.user.result.email];
+  
+ 
+  if(req.query.low  <  req.session.user.result.low || isNaN(req.session.user.result.low) || req.query.low == 10){
       con.query(sql, data, (error, results, fields) => {
       if (error){
         return console.error(error.message);
       }
       else
       {
-        con.query("SELECT * FROM USER WHERE USER_EMAIL = ?", [req.session.user.result.email], function (err, result, fields) 
+        con.query(sql2, data2, (error, result, fields) => {
+        if (error){
+          return console.error(error.message);
+        }
+        else
         {
-          if (err) 
-            writeResult(req, res, {'error' : err});
-          else
-          {
-            req.session.user = {'result' : {'id': result[0].USER_ID, 'email': result[0].USER_EMAIL, 'low': result[0].USER_LOW}};
-            writeResult(req, res, req.session.user);
-          }
-        });
+          req.session.user = {'result' : {'id': result[0].USER_ID, 'email': result[0].USER_EMAIL, 'low': result[0].USER_LOW}};
+          writeResult(req, res, req.session.user);
+        }
+      });
       }
-      console.log('Rows affected:', results.affectedRows);
+      //console.log('Rows affected:', results.affectedRows);
     });
   }
-}
-
-function resetLow(req, res)
-{
-  var con = mysql.createConnection(conInfo);
-  
-  console.log("@resetLow");
-  let sql = `UPDATE USER
-           SET USER_LOW = ?
-           WHERE USER_ID = ?`;
- 
-  let data = [req.query.low, req.session.user.result.id];
-  con.query(sql, data, (error, results, fields) => {
-  if (error){
-    return console.error(error.message);
-    }
-  else
-  {
-    con.query("SELECT * FROM USER WHERE USER_EMAIL = ?", [req.session.user.result.email], function (err, result, fields) 
-    {
-    if (err) 
-      writeResult(req, res, {'error' : err});
-    else
-    {
-      req.session.user = {'result' : {'id': result[0].USER_ID, 'email': result[0].USER_EMAIL, 'low': result[0].USER_LOW}};
-      writeResult(req, res, req.session.user);
-    }
-    });
-  }
-  console.log('Rows affected:', results.affectedRows);
-  });
 }
 
 function whoIsLoggedIn(req, res)
